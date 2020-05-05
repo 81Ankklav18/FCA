@@ -1,7 +1,7 @@
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class Norris {
+public class IntrervalNorris {
     private Map<Set<String>, List<Interval>> resultList = new HashMap<>();
     private Map<Set<String>, List<Interval>> listOfNonClosableElements = new HashMap<>();
 
