@@ -3,7 +3,7 @@ import java.util.stream.Collectors;
 
 public class IntrervalNorris {
     private Map<Set<String>, List<Interval>> resultList = new HashMap<>();
-    private Map<Set<String>, List<Interval>> listOfNonClosableElements = new HashMap<>();
+    private final Map<Set<String>, List<Interval>> listOfNonClosableElements = new HashMap<>();
 
     public Map<Set<String>, List<Interval>> getNorris(List<Map<Set<String>, List<Interval>>> matrix){
         resultList.putAll(matrix.get(0));
@@ -51,11 +51,10 @@ public class IntrervalNorris {
 
         val1.forEach((k1, v1) -> val2.forEach((k2, v2) -> {
             if (Interval.equals(v1, v2)){
-                Set<String> set = new HashSet();
+                Set<String> set = new HashSet<>();
                 set.addAll(k1);
                 set.addAll(k2);
-                List<Interval> intervals = new ArrayList<>();
-                intervals.addAll(v1);
+                List<Interval> intervals = new ArrayList<>(v1);
                 result.put(set, v1);
                 if (!k1.containsAll(k2))
                     listOfNonClosableElements.put(k1, v1);
@@ -70,16 +69,13 @@ public class IntrervalNorris {
     Map<Set<String>, List<Interval>> intersection(Map<Set<String>, List<Interval>> val1, Map<Set<String>, List<Interval>> val2){
         Map<Set<String>, List<Interval>> result = new HashMap<>();
 
-        val1.forEach((k1, v1) -> {
-            val2.forEach((k2, v2) -> {
-                Set<String> set = new HashSet();
-                set.addAll(k1);
-                set.addAll(k2);
-                List<Interval> intervals = new ArrayList<>();
-                intervals.addAll(Interval.getLargestInterval(v1, v2));
-                result.put(set, intervals);
-            });
-        });
+        val1.forEach((k1, v1) -> val2.forEach((k2, v2) -> {
+            Set<String> set = new HashSet<>();
+            set.addAll(k1);
+            set.addAll(k2);
+            List<Interval> intervals = new ArrayList<>(Interval.getLargestInterval(v1, v2));
+            result.put(set, intervals);
+        }));
 
         return result;
     }

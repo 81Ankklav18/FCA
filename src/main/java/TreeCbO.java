@@ -1,12 +1,11 @@
 import edu.stanford.nlp.trees.Tree;
-import edu.stanford.nlp.trees.TreeGraphNode;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class TreeCbO extends Lattice {
     private Map<Set<String>, Tree> resultList = new HashMap<>();
-    private Map<Set<String>, Tree> listOfNonClosableElements = new HashMap<>();
+    private final Map<Set<String>, Tree> listOfNonClosableElements = new HashMap<>();
     private List<Map<Set<String>, Tree>> valueList = new ArrayList<>();
     int count = 0;
 
@@ -17,8 +16,8 @@ public class TreeCbO extends Lattice {
 
     void prepare(List<Map<Set<String>, Tree>> matrix) {
         valueList = matrix;
-        for (int i = 0; i < matrix.size(); i++) {
-            resultList.putAll(matrix.get(i));
+        for (Map<Set<String>, Tree> setTreeMap : matrix) {
+            resultList.putAll(setTreeMap);
         }
         count = matrix.size();
     }
@@ -54,7 +53,7 @@ public class TreeCbO extends Lattice {
 //                        (e1, e2) -> e1, LinkedHashMap::new));
 
         stage = convertMapToListOfMap(resultList);
-        while (!resultList.keySet().stream().filter(x -> x.size() == count).findFirst().isPresent()) {
+        while (resultList.keySet().stream().noneMatch(x -> x.size() == count)) {
             recursiveCbO(stage);
         }
 
@@ -66,10 +65,10 @@ public class TreeCbO extends Lattice {
                         (e1, e2) -> e1, LinkedHashMap::new));
 
         System.out.println("//////////////");
-        List<Tree> treesVal = resultList.entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList());
+        List<Tree> treesVal = new ArrayList<>(resultList.values());
 
-        for (int i = 0; i < treesVal.size(); i++){
-            treesVal.get(i).pennPrint();
+        for (Tree tree : treesVal) {
+            tree.pennPrint();
             System.out.println("----------");
         }
         return this.resultList;
@@ -83,7 +82,7 @@ public class TreeCbO extends Lattice {
             return Boolean.FALSE;
         } else {
             for (int i = 0; i < l1.size(); i++) {
-                if (l1.get(i) != l2.get(i)) {
+                if (!l1.get(i).equals(l2.get(i))) {
                     return Boolean.FALSE;
                 }
             }
@@ -97,7 +96,7 @@ public class TreeCbO extends Lattice {
         stage.forEach((k, v) -> {
             Map<Set<String>, Tree> temp = new HashMap<>();
             temp.put(k, v);
-            convertedList.add(new HashMap<Set<String>, Tree>(temp));
+            convertedList.add(new HashMap<>(temp));
         });
 
         return convertedList;
@@ -107,15 +106,13 @@ public class TreeCbO extends Lattice {
         Map<Set<String>, Tree> result = new HashMap<>();
         TreeUtils treeUtils = new TreeUtils();
 
-        val1.forEach((k1, v1) -> {
-            val2.forEach((k2, v2) -> {
-                Set<String> set = new HashSet();
-                set.addAll(k1);
-                set.addAll(k2);
-                Tree resultTree = treeUtils.treesIntersection(v1, v2);
-                result.put(set, resultTree);
-            });
-        });
+        val1.forEach((k1, v1) -> val2.forEach((k2, v2) -> {
+            Set<String> set = new HashSet<>();
+            set.addAll(k1);
+            set.addAll(k2);
+            Tree resultTree = treeUtils.treesIntersection(v1, v2);
+            result.put(set, resultTree);
+        }));
 
         return result;
     }

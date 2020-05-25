@@ -59,8 +59,8 @@ public class TreeUtils {
     }
 
     public Tree addChild(String child, Tree ret) {
-        Tree childNode = new TreeGraphNode(new LabelImpl(child));
-        ((TreeGraphNode) childNode).setParent(new TreeGraphNode(ret));
+        TreeGraphNode childNode = new TreeGraphNode(new LabelImpl(child));
+        childNode.setParent(new TreeGraphNode(ret));
         this.children.add(childNode);
 
         ret.addChild(childNode);
@@ -73,14 +73,11 @@ public class TreeUtils {
     }
 
     public Tree treesIntersection(Tree t1, Tree t2) {
-        Tree t1Root = t1;
-        Tree t2Root = t2;
-
-        if (!t1Root.label().toString().equals(t2Root.label().toString())) {
+        if (!t1.label().toString().equals(t2.label().toString())) {
             return null;
         }
 
-        Tree ret = new TreeGraphNode(t1Root.label());
+        Tree ret = new TreeGraphNode(t1.label());
 
         inspectChildren(t1, t2, ret);
 
@@ -109,19 +106,17 @@ public class TreeUtils {
     }
 
     public static boolean equalsTrees(Tree v1, Tree v2) {
-        Tree vv1 = v1;
-        Tree vv2 = v2;
-        if (vv1.depth() != vv2.depth()) {
+        if (v1.depth() != v2.depth()) {
             return Boolean.FALSE;
         }
-        if (vv1.numChildren() != vv2.numChildren()) {
+        if (v1.numChildren() != v2.numChildren()) {
             return Boolean.FALSE;
         }
-        for (int i = 0; i < vv1.numChildren(); i++) {
-            if (!vv1.getChild(i).label().value().equals(vv2.getChild(i).label().value())) {
+        for (int i = 0; i < v1.numChildren(); i++) {
+            if (!v1.getChild(i).label().value().equals(v2.getChild(i).label().value())) {
                 return Boolean.FALSE;
             }
-            if (!equalsTrees(vv1.getChild(i), vv2.getChild(i))) {
+            if (!equalsTrees(v1.getChild(i), v2.getChild(i))) {
                 return Boolean.FALSE;
             }
         }

@@ -3,19 +3,17 @@ import edu.stanford.nlp.trees.TreeGraphNode;
 
 public class TreeImpl {
     public static boolean equalsTrees(Tree v1, Tree v2) {
-        Tree vv1 = v1;
-        Tree vv2 = v2;
-        if (vv1.depth() != vv2.depth()) {
+        if (v1.depth() != v2.depth()) {
             return Boolean.FALSE;
         }
-        if (vv1.numChildren() != vv2.numChildren()) {
+        if (v1.numChildren() != v2.numChildren()) {
             return Boolean.FALSE;
         }
-        for (int i = 0; i < vv1.numChildren(); i++) {
-            if (!vv1.getChild(i).label().toString().equals(vv2.getChild(i).label().toString())) {
+        for (int i = 0; i < v1.numChildren(); i++) {
+            if (!v1.getChild(i).label().toString().equals(v2.getChild(i).label().toString())) {
                 return Boolean.FALSE;
             }
-            if (!equalsTrees(vv1.getChild(i), vv2.getChild(i))) {
+            if (!equalsTrees(v1.getChild(i), v2.getChild(i))) {
                 return Boolean.FALSE;
             }
         }
@@ -24,17 +22,15 @@ public class TreeImpl {
     }
 
     public static Tree intersect(Tree v1, Tree v2, Tree result) {
-        Tree vv1 = v1;
-        Tree vv2 = v2;
-        for (int i = 0; i < vv1.numChildren(); i++) {
-            for (int j = 0; j < vv2.numChildren(); j++) {
-                if (vv1.getChild(i).label().toString().equals(vv2.getChild(j).label().toString())) {
-                    result.addChild(new TreeGraphNode(vv1.getChild(i)));
-                    if (result.numChildren() > Integer.min(vv1.numChildren(), vv2.numChildren())) {
-                        result = deleteDuplicate(result, Integer.min(vv1.numChildren(), vv2.numChildren()));
+        for (int i = 0; i < v1.numChildren(); i++) {
+            for (int j = 0; j < v2.numChildren(); j++) {
+                if (v1.getChild(i).label().toString().equals(v2.getChild(j).label().toString())) {
+                    result.addChild(new TreeGraphNode(v1.getChild(i)));
+                    if (result.numChildren() > Integer.min(v1.numChildren(), v2.numChildren())) {
+                        deleteDuplicate(result, Integer.min(v1.numChildren(), v2.numChildren()));
                     }
                     if (result.numChildren() != 0)
-                        intersect(vv1.getChild(i), vv2.getChild(j), result.getChild(result.numChildren() - 1));
+                        intersect(v1.getChild(i), v2.getChild(j), result.getChild(result.numChildren() - 1));
                 }
             }
         }

@@ -1,12 +1,11 @@
 import edu.stanford.nlp.trees.Tree;
-import edu.stanford.nlp.trees.TreeGraphNode;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class TreeNorris extends Lattice {
     private Map<Set<String>, Tree> resultList = new HashMap<>();
-    private Map<Set<String>, Tree> listOfNonClosableElements = new HashMap<>();
+    private final Map<Set<String>, Tree> listOfNonClosableElements = new HashMap<>();
 
     public Map<Set<String>, Tree> getNorris(List<Map<Set<String>, Tree>> matrix) {
         resultList.putAll(matrix.get(0));
@@ -78,7 +77,7 @@ public class TreeNorris extends Lattice {
 
         val1.forEach((k1, v1) -> val2.forEach((k2, v2) -> {
             if (TreeUtils.equalsTrees(v1, v2)) {
-                Set<String> set = new HashSet();
+                Set<String> set = new HashSet<>();
                 set.addAll(k1);
                 set.addAll(k2);
                 result.put(set, v1);
@@ -96,20 +95,18 @@ public class TreeNorris extends Lattice {
         Map<Set<String>, Tree> result = new HashMap<>();
         TreeUtils treeUtils = new TreeUtils();
 
-        val1.forEach((k1, v1) -> {
-            val2.forEach((k2, v2) -> {
-                Set<String> set = new HashSet();
-                set.addAll(k1);
-                set.addAll(k2);
-                Tree resultTree;
-                if (set.size() > 1){
-                    resultTree = treeUtils.treesIntersection(v1, v2);
-                    result.put(set, resultTree);
-                } else {
-                    result.put(k1, v1);
-                }
-            });
-        });
+        val1.forEach((k1, v1) -> val2.forEach((k2, v2) -> {
+            Set<String> set = new HashSet<>();
+            set.addAll(k1);
+            set.addAll(k2);
+            Tree resultTree;
+            if (set.size() > 1){
+                resultTree = treeUtils.treesIntersection(v1, v2);
+                result.put(set, resultTree);
+            } else {
+                result.put(k1, v1);
+            }
+        }));
 
         return result;
     }

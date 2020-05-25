@@ -22,22 +22,8 @@ public class Interval {
         return "[" + min + "; " + max + "]";
     }
 
-    static private int getMin(int i1, int i2) {
-        if (i1 < i2)
-            return i1;
-        else
-            return i2;
-    }
-
-    static private int getMax(int i1, int i2) {
-        if (i1 > i2)
-            return i1;
-        else
-            return i2;
-    }
-
     static public Interval getLargestInterval(Interval i1, Interval i2){
-        return new Interval(getMin(i1.min, i2.min), getMax(i1.max, i2.max));
+        return new Interval(Math.min(i1.min, i2.min), Math.max(i1.max, i2.max));
     }
 
     static public List<Interval> getLargestInterval(List<Interval> l1, List<Interval> l2){
@@ -51,18 +37,15 @@ public class Interval {
     static public boolean equals(List<Interval> i1, List<Interval> i2){
         boolean flag = true;
         for (int i = 0; i < i1.size(); i++){
-            if (!equals(i1.get(i), i2.get(i))){
+            if (!equals(i1.get(i), i2.get(i))) {
                 flag = false;
+                break;
             }
         }
         return flag;
     }
 
     static public boolean equals(Interval i1, Interval i2){
-        if(i1.min == i2.min && i1.max == i2.max){
-            return true;
-        } else {
-            return false;
-        }
+        return i1.min == i2.min && i1.max == i2.max;
     }
 }
