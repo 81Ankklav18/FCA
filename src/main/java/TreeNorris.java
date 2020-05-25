@@ -44,7 +44,7 @@ public class TreeNorris extends Lattice {
             Tree v1 = e.getValue();
             for (Map.Entry<Set<String>, Tree> entry : val2.entrySet()) {
                 Tree v2 = entry.getValue();
-                return equalsTrees(v1, v2);
+                return TreeUtils.equalsTrees(v1, v2);
             }
         }
 
@@ -52,32 +52,32 @@ public class TreeNorris extends Lattice {
     }
 
     //TODO: следует вынести в отдельный класс как переопределенный
-    public boolean equalsTrees(Tree v1, Tree v2) {
-        Tree vv1 = v1;
-        Tree vv2 = v2;
-        if (vv1.depth() != vv2.depth()) {
-            return Boolean.FALSE;
-        }
-        if (vv1.numChildren() != vv2.numChildren()){
-            return Boolean.FALSE;
-        }
-        for (int i = 0; i < vv1.numChildren(); i++) {
-            if (!vv1.getChild(i).label().toString().equals(vv2.getChild(i).label().toString())) {
-                return Boolean.FALSE;
-            }
-            if (!equalsTrees(vv1.getChild(i), vv2.getChild(i))){
-                return Boolean.FALSE;
-            }
-        }
-
-        return Boolean.TRUE;
-    }
+//    public boolean equalsTrees(Tree v1, Tree v2) {
+//        Tree vv1 = v1;
+//        Tree vv2 = v2;
+//        if (vv1.depth() != vv2.depth()) {
+//            return Boolean.FALSE;
+//        }
+//        if (vv1.numChildren() != vv2.numChildren()){
+//            return Boolean.FALSE;
+//        }
+//        for (int i = 0; i < vv1.numChildren(); i++) {
+//            if (!vv1.getChild(i).label().toString().equals(vv2.getChild(i).label().toString())) {
+//                return Boolean.FALSE;
+//            }
+//            if (!equalsTrees(vv1.getChild(i), vv2.getChild(i))){
+//                return Boolean.FALSE;
+//            }
+//        }
+//
+//        return Boolean.TRUE;
+//    }
 
     Map<Set<String>, Tree> union(Map<Set<String>, Tree> val1, Map<Set<String>, Tree> val2) {
         Map<Set<String>, Tree> result = new HashMap<>();
 
         val1.forEach((k1, v1) -> val2.forEach((k2, v2) -> {
-            if (equalsTrees(v1, v2)) {
+            if (TreeUtils.equalsTrees(v1, v2)) {
                 Set<String> set = new HashSet();
                 set.addAll(k1);
                 set.addAll(k2);
@@ -94,14 +94,20 @@ public class TreeNorris extends Lattice {
 
     Map<Set<String>, Tree> intersection(Map<Set<String>, Tree> val1, Map<Set<String>, Tree> val2) {
         Map<Set<String>, Tree> result = new HashMap<>();
+        TreeUtils treeUtils = new TreeUtils();
 
         val1.forEach((k1, v1) -> {
             val2.forEach((k2, v2) -> {
                 Set<String> set = new HashSet();
                 set.addAll(k1);
                 set.addAll(k2);
-                Tree resultTree = intersect(v1, v2, new TreeGraphNode(v2));
-                result.put(set, resultTree);
+                Tree resultTree;
+                if (set.size() > 1){
+                    resultTree = treeUtils.treesIntersection(v1, v2);
+                    result.put(set, resultTree);
+                } else {
+                    result.put(k1, v1);
+                }
             });
         });
 
@@ -109,74 +115,74 @@ public class TreeNorris extends Lattice {
     }
 
     //TODO: следует вынести в отдельный класс
-    public Tree intersect(Tree v1, Tree v2, Tree result) {
-        Tree vv1 = v1;
-        Tree vv2 = v2;
-        for (int i = 0; i < vv1.numChildren(); i++) {
-            for (int j = 0; j < vv2.numChildren(); j++) {
-                if (vv1.getChild(i).label().toString().equals(vv2.getChild(j).label().toString())) {
-                    result.addChild(new TreeGraphNode(vv1.getChild(i)));
-                    if (result.numChildren() > Integer.min(vv1.numChildren(), vv2.numChildren())) {
-                        result = deleteDuplicate(result, Integer.min(vv1.numChildren(), vv2.numChildren()));
-                    }
-                    if (result.numChildren() != 0)
-                        intersect(vv1.getChild(i), vv2.getChild(j), result.getChild(result.numChildren() - 1));
-                }
-            }
-        }
+//    public Tree intersect(Tree v1, Tree v2, Tree result) {
+//        Tree vv1 = v1;
+//        Tree vv2 = v2;
+//        for (int i = 0; i < vv1.numChildren(); i++) {
+//            for (int j = 0; j < vv2.numChildren(); j++) {
+//                if (vv1.getChild(i).label().toString().equals(vv2.getChild(j).label().toString())) {
+//                    result.addChild(new TreeGraphNode(vv1.getChild(i)));
+//                    if (result.numChildren() > Integer.min(vv1.numChildren(), vv2.numChildren())) {
+//                        result = deleteDuplicate(result, Integer.min(vv1.numChildren(), vv2.numChildren()));
+//                    }
+//                    if (result.numChildren() != 0)
+//                        intersect(vv1.getChild(i), vv2.getChild(j), result.getChild(result.numChildren() - 1));
+//                }
+//            }
+//        }
+//
+//        return result;
+//    }
 
-        return result;
-    }
-
-    Tree deleteDuplicate(Tree result, int minChildren) {
-        int minDepth = Integer.MAX_VALUE;
-        int maxDepth = Integer.MIN_VALUE;
-        boolean flag = Boolean.FALSE;
-        while (result.numChildren() > minChildren) {
-            for (int i = 0; i < result.numChildren() - 1; i++) {
-                for (int j = result.numChildren() - 1; j > 0; j--) {
-                    if (result.getChild(i).label().toString().equals(result.getChild(j).label().toString())
-                            && i != j) {
-                        if (minDepth > result.getChild(i).depth()) {
-                            minDepth = result.getChild(i).depth();
-                        }
-                        if (maxDepth < result.numChildren()) {
-                            maxDepth = result.getChild(i).depth();
-                        }
-                    }
-                }
-            }
-
-            if (minDepth == maxDepth) {
-                for (int i = result.numChildren() - 1; i > 0; i--) {
-                    for (int j = result.numChildren() - 1; j > 0; j--) {
-                        if (result.getChild(i).label().toString().equals(result.getChild(j).label().toString())
-                                && i != j) {
-                            if (result.getChild(i).depth() == minDepth) {
-                                result.removeChild(i);
-                                flag = Boolean.TRUE;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (!flag) {
-                for (int i = result.numChildren() - 1; i > 0; i--) {
-                    for (int j = result.numChildren() - 1; j > 0; j--) {
-                        if (result.getChild(i).label().toString().equals(result.getChild(j).label().toString())
-                                && i != j) {
-                            if (result.getChild(i).depth() == minDepth) {
-                                result.removeChild(i);
-                            }
-                        }
-                    }
-                }
-            }
-
-        }
-
-        return result;
-    }
+//    Tree deleteDuplicate(Tree result, int minChildren) {
+//        int minDepth = Integer.MAX_VALUE;
+//        int maxDepth = Integer.MIN_VALUE;
+//        boolean flag = Boolean.FALSE;
+//        while (result.numChildren() > minChildren) {
+//            for (int i = 0; i < result.numChildren() - 1; i++) {
+//                for (int j = result.numChildren() - 1; j > 0; j--) {
+//                    if (result.getChild(i).label().toString().equals(result.getChild(j).label().toString())
+//                            && i != j) {
+//                        if (minDepth > result.getChild(i).depth()) {
+//                            minDepth = result.getChild(i).depth();
+//                        }
+//                        if (maxDepth < result.numChildren()) {
+//                            maxDepth = result.getChild(i).depth();
+//                        }
+//                    }
+//                }
+//            }
+//
+//            if (minDepth == maxDepth) {
+//                for (int i = result.numChildren() - 1; i > 0; i--) {
+//                    for (int j = result.numChildren() - 1; j > 0; j--) {
+//                        if (result.getChild(i).label().toString().equals(result.getChild(j).label().toString())
+//                                && i != j) {
+//                            if (result.getChild(i).depth() == minDepth) {
+//                                result.removeChild(i);
+//                                flag = Boolean.TRUE;
+//                                break;
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//
+//            if (!flag) {
+//                for (int i = result.numChildren() - 1; i > 0; i--) {
+//                    for (int j = result.numChildren() - 1; j > 0; j--) {
+//                        if (result.getChild(i).label().toString().equals(result.getChild(j).label().toString())
+//                                && i != j) {
+//                            if (result.getChild(i).depth() == minDepth) {
+//                                result.removeChild(i);
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//
+//        }
+//
+//        return result;
+//    }
 }
